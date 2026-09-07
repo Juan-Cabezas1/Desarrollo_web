@@ -26,11 +26,12 @@
                         <div class="money-input"><span>$</span><input id="income" type="number" min="0" step="1000" placeholder="0" required></div>
                         <small>Lo que recibes después de descuentos.</small>
                     </label>
-                    <label class="field">
+                    <div class="field fixed-expenses-field">
                         <span>Gastos fijos mensuales</span>
-                        <div class="money-input"><span>$</span><input id="fixedExpenses" type="number" min="0" step="1000" placeholder="0" required></div>
-                        <small>Arriendo, servicios, cuotas y suscripciones.</small>
-                    </label>
+                        <div class="fixed-heading"><small>Arriendo, servicios, cuotas y suscripciones.</small><button type="button" id="addFixed" class="text-button">+ Agregar gasto</button></div>
+                        <div id="fixedList" class="fixed-list" aria-live="polite"></div>
+                        <div class="fixed-total"><span>Total gastos fijos</span><strong id="fixedTotalValue">$0</strong></div>
+                    </div>
                 </div>
                 <div class="shared-heading">
                     <div><span class="field-label">Gastos compartidos</span><small>Opcional · agrega lo que divides con alguien.</small></div>

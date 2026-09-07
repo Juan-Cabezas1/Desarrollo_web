@@ -5,6 +5,7 @@ const setupView = document.getElementById("setupView");
 const dashboardView = document.getElementById("dashboardView");
 const setupForm = document.getElementById("setupForm");
 const sharedList = document.getElementById("sharedList");
+const fixedList = document.getElementById("fixedList");
 const expenseForm = document.getElementById("expenseForm");
 let appData = null;
 
@@ -25,6 +26,31 @@ function formatMoney(value) {
     return currency.format(Number(value) || 0);
 }
 
+function addFixedRow(name = "", amount = "") {
+    const row = document.createElement("div");
+    row.className = "fixed-row";
+    row.innerHTML = `<input class="fixed-name" type="text" maxlength="40" placeholder="Ej. Arriendo" value="${escapeHtml(name)}"><div class="money-input"><span>$</span><input class="fixed-amount" type="number" min="0" step="1000" placeholder="0" value="${amount}"></div><button class="remove-button" type="button" aria-label="Eliminar gasto fijo">×</button>`;
+    row.querySelectorAll(".fixed-amount").forEach((input) => input.addEventListener("input", updateFixedTotal));
+    row.querySelector(".remove-button").addEventListener("click", () => { row.remove(); updateFixedTotal(); });
+    fixedList.appendChild(row);
+    updateFixedTotal();
+}
+
+function getFixedExpenses() {
+    return [...document.querySelectorAll(".fixed-row")].map((row) => ({
+        name: row.querySelector(".fixed-name").value.trim() || "Gasto fijo",
+        amount: Number(row.querySelector(".fixed-amount").value) || 0
+    })).filter((expense) => expense.amount > 0);
+}
+
+function getFixedTotal() {
+    return [...document.querySelectorAll(".fixed-row")].reduce((total, row) => total + (Number(row.querySelector(".fixed-amount").value) || 0), 0);
+}
+
+function updateFixedTotal() {
+    document.getElementById("fixedTotalValue").textContent = formatMoney(getFixedTotal());
+}
+
 function addSharedRow(name = "", amount = "", people = 2, contributionPercentage = "") {
     const row = document.createElement("div");
     row.className = "shared-row";
@@ -41,11 +67,13 @@ function addSharedRow(name = "", amount = "", people = 2, contributionPercentage
 }
 
 document.getElementById("addShared").addEventListener("click", () => addSharedRow());
+document.getElementById("addFixed").addEventListener("click", () => addFixedRow());
 
 setupForm.addEventListener("submit", (event) => {
     event.preventDefault();
     const income = Number(document.getElementById("income").value);
-    const fixedExpenses = Number(document.getElementById("fixedExpenses").value);
+    const fixedExpenseItems = getFixedExpenses();
+    const fixedExpenses = fixedExpenseItems.reduce((total, item) => total + item.amount, 0);
     const sharedExpenses = [...document.querySelectorAll(".shared-row")].map((row) => ({
         name: row.querySelector(".shared-name").value.trim() || "Gasto compartido",
         amount: Number(row.querySelector(".shared-amount").value) || 0,
@@ -58,7 +86,7 @@ setupForm.addEventListener("submit", (event) => {
         document.getElementById("setupError").textContent = "Revisa los valores: los gastos fijos no pueden superar tus ingresos.";
         return;
     }
-    appData = { income, fixedExpenses, sharedExpenses, expenses: [], configuredAt: new Date().toISOString() };
+    appData = { income, fixedExpenses, fixedExpenseItems, sharedExpenses, expenses: [], configuredAt: new Date().toISOString() };
     saveData();
     renderDashboard();
 });
@@ -83,7 +111,9 @@ document.getElementById("resetButton").addEventListener("click", () => {
         localStorage.removeItem(STORAGE_KEY);
         appData = null;
         setupForm.reset();
+        fixedList.innerHTML = "";
         sharedList.innerHTML = "";
+        updateFixedTotal();
         showSetup();
     }
 });
