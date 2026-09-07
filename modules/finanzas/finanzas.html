@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Gestor de finanzas personales">
+    <title>Saldo Vivo | Finanzas personales</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="finanzas.css">
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="../../index.html" aria-label="Volver al inicio">Saldo Vivo<span>.</span></a>
+        <div class="topbar-meta">Finanzas personales <span class="status-dot"></span></div>
+    </header>
+
+    <main class="app-shell">
+        <section id="setupView" class="setup-view" aria-labelledby="setupTitle">
+            <div class="eyebrow">Configuración inicial · 01</div>
+            <h1 id="setupTitle">Dale claridad a<br><em>tu dinero.</em></h1>
+            <p class="intro">Empecemos con una fotografía sencilla de tus finanzas. Solo necesitas tus valores mensuales.</p>
+            <form id="setupForm" class="setup-form">
+                <div class="field-grid">
+                    <label class="field">
+                        <span>Ingresos mensuales</span>
+                        <div class="money-input"><span>$</span><input id="income" type="number" min="0" step="1000" placeholder="0" required></div>
+                        <small>Lo que recibes después de descuentos.</small>
+                    </label>
+                    <label class="field">
+                        <span>Gastos fijos mensuales</span>
+                        <div class="money-input"><span>$</span><input id="fixedExpenses" type="number" min="0" step="1000" placeholder="0" required></div>
+                        <small>Arriendo, servicios, cuotas y suscripciones.</small>
+                    </label>
+                </div>
+                <div class="shared-heading">
+                    <div><span class="field-label">Gastos compartidos</span><small>Opcional · agrega lo que divides con alguien.</small></div>
+                    <button type="button" id="addShared" class="text-button">+ Agregar gasto</button>
+                </div>
+                <div id="sharedList" class="shared-list" aria-live="polite"></div>
+                <div class="setup-actions"><span class="form-note">Puedes cambiar estos datos cuando quieras.</span><button class="primary-button" type="submit">Guardar configuración <span>→</span></button></div>
+                <p id="setupError" class="form-error" role="alert"></p>
+            </form>
+        </section>
+
+        <section id="dashboardView" class="dashboard-view" hidden aria-labelledby="dashboardTitle">
+            <div class="dashboard-heading">
+                <div><div class="eyebrow">Resumen financiero</div><h1 id="dashboardTitle">Tu dinero,<br><em>bajo control.</em></h1></div>
+                <button id="resetButton" class="ghost-button" type="button">↻ <span>Reconfigurar</span></button>
+            </div>
+            <div class="summary-grid">
+                <article class="summary-card summary-main card shadow-sm"><div class="card-kicker">Disponible este mes</div><strong id="availableValue">$0</strong><p id="availableCaption">Después de tus compromisos fijos</p><div class="progress-track"><span id="availableProgress"></span></div></article>
+                <article class="summary-card card shadow-sm"><div class="card-kicker">Ingresos</div><strong id="incomeValue">$0</strong><p>Entrada mensual</p></article>
+                <article class="summary-card card shadow-sm"><div class="card-kicker">Compromisos</div><strong id="commitmentsValue">$0</strong><p>Fijos + compartidos</p></article>
+                <article class="summary-card card shadow-sm"><div class="card-kicker">Gastado hoy</div><strong id="todayValue">$0</strong><p id="todayCaption">Todavía no hay gastos</p></article>
+            </div>
+            <div class="dashboard-columns">
+                <section class="panel expense-panel" aria-labelledby="expenseTitle">
+                    <div class="panel-heading"><div><div class="eyebrow">Registro diario</div><h2 id="expenseTitle">¿En qué gastaste?</h2></div><span class="date-pill" id="todayDate"></span></div>
+                    <form id="expenseForm" class="expense-form">
+                        <label class="field"><span>Descripción</span><input id="expenseDescription" type="text" maxlength="60" placeholder="Ej. Almuerzo" required></label>
+                        <div class="field-row"><label class="field"><span>Categoría</span><select id="expenseCategory"><option>Alimentación</option><option>Transporte</option><option>Hogar</option><option>Ocio</option><option>Salud</option><option>Otros</option></select></label><label class="field"><span>Valor</span><div class="money-input"><span>$</span><input id="expenseAmount" type="number" min="100" step="100" placeholder="0" required></div></label></div>
+                        <button class="primary-button full-button" type="submit">Registrar gasto <span>+</span></button>
+                        <p id="expenseError" class="form-error" role="alert"></p>
+                    </form>
+                </section>
+                <section class="panel activity-panel" aria-labelledby="activityTitle"><div class="panel-heading"><div><div class="eyebrow">Últimos movimientos</div><h2 id="activityTitle">Actividad</h2></div><span class="movement-count" id="movementCount">0</span></div><div id="expenseList" class="expense-list"></div></section>
+            </div>
+        </section>
+    </main>
+    <footer class="app-footer"><span>SALDO VIVO / CONTROL COTIDIANO</span><a href="../../index.html">Volver al landing</a></footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="finanzas.js"></script>
+</body>
+</html>
