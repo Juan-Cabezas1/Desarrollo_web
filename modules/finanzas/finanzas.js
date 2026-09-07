@@ -6,7 +6,7 @@ const dashboardView = document.getElementById("dashboardView");
 const setupForm = document.getElementById("setupForm");
 const sharedList = document.getElementById("sharedList");
 const expenseForm = document.getElementById("expenseForm");
-let appData = loadData();
+let appData = null;
 
 function loadData() {
     try {
@@ -112,7 +112,28 @@ function renderDashboard() {
     document.getElementById("todayCaption").textContent = todaySpent ? "Registrado durante el día" : "Todavía no hay gastos";
     document.getElementById("todayDate").textContent = new Intl.DateTimeFormat("es-CO", { day: "numeric", month: "short" }).format(new Date());
     document.getElementById("availableProgress").style.width = `${Math.min(100, Math.max(0, (Math.max(0, available) / Math.max(1, appData.income)) * 100))}%`;
+    updateBudgetAlert(commitments, totalSpent, available);
     renderExpenses();
+}
+
+function updateBudgetAlert(commitments, totalSpent, available) {
+    const alert = document.getElementById("budgetAlert");
+    const messages = [];
+    const initialAvailable = appData.income - commitments;
+    const latestExpense = appData.expenses[0];
+
+    if (commitments > appData.income) {
+        messages.push(`Tus compromisos iniciales superan el monto inicial de ingresos por ${formatMoney(commitments - appData.income)}.`);
+    }
+    if (latestExpense && latestExpense.amount > initialAvailable - (totalSpent - latestExpense.amount)) {
+        messages.push(`El gasto "${escapeHtml(latestExpense.description)}" supera el monto inicial disponible.`);
+    }
+    if (available < 0) {
+        messages.push(`La suma de tus gastos supera tus ingresos mensuales por ${formatMoney(Math.abs(available))}.`);
+    }
+
+    alert.innerHTML = messages.map((message) => `<span>!</span><p>${message}</p>`).join("");
+    alert.hidden = messages.length === 0;
 }
 
 function renderExpenses() {
@@ -142,5 +163,8 @@ function escapeHtml(value) {
     return value.replace(/[&<>'"]/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[character]));
 }
 
-if (appData && Number.isFinite(appData.income)) renderDashboard();
-else showSetup();
+document.addEventListener("DOMContentLoaded", () => {
+    appData = loadData();
+    if (appData && Number.isFinite(appData.income)) renderDashboard();
+    else showSetup();
+});
